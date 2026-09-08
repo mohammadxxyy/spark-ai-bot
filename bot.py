@@ -1314,7 +1314,7 @@ def main() -> None:
     application.add_error_handler(error_handler)
 
     print("[SUCCESS] تم تشغيل بوت Spark AI بنجاح! البوت يستقبل الآن طلبات الحملات والإعلانات.")
-    print("[INFO] رابط البوت على تيلجرام: https://t.me/Mohammad2008mx184BOT")
+    print("[INFO] رابط البوت على تيلجرام: https://t.me/SparkAIMarketingBot")
 
     # بدء استقبال الرسائل (Polling)
     application.run_polling()
