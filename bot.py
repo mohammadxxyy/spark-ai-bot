@@ -138,22 +138,73 @@ async def safe_edit_message(
 # -------------------------------------------------------------
 
 def main_menu_keyboard() -> InlineKeyboardMarkup:
-    """لوحة التحكم والقائمة الرئيسية لبوت Spark AI"""
+    """لوحة التحكم والقائمة الرئيسية الاحترافية لشركة Spark AI"""
     keyboard = [
         [
-            InlineKeyboardButton("🚀 طلب حملة إعلانية جديدة", callback_data="menu_new_order"),
+            InlineKeyboardButton("🚀 إطلاق حملة إعلانية جديدة", callback_data="menu_new_order"),
         ],
         [
-            InlineKeyboardButton("📊 خدماتنا وباقات الإعلانات", callback_data="menu_services"),
-            InlineKeyboardButton("💡 توصية المنصات الأنسب لك", callback_data="menu_recommend"),
+            InlineKeyboardButton("📊 حاسبة العائد المتوقع (ROAS)", callback_data="menu_roas_calc"),
+            InlineKeyboardButton("🎁 فحص إعلاني مجاني (Audit)", callback_data="menu_free_audit"),
         ],
         [
-            InlineKeyboardButton("❓ الأسئلة الشائعة (FAQ)", callback_data="menu_faq"),
-            InlineKeyboardButton("🔍 متابعة حالة طلبي", callback_data="menu_track"),
+            InlineKeyboardButton("🏆 قصص نجاح وإنجازاتنا", callback_data="menu_cases"),
+            InlineKeyboardButton("💡 توصية المنصة الأنسب لك", callback_data="menu_recommend"),
+        ],
+        [
+            InlineKeyboardButton("💼 باقات وخدمات التسويق", callback_data="menu_services"),
+            InlineKeyboardButton("🔍 متابعة حالة الطلب", callback_data="menu_track"),
+        ],
+        [
+            InlineKeyboardButton("🎟️ كود خصم ترحيبي 20%", callback_data="menu_promo"),
+            InlineKeyboardButton("❓ الأسئلة الشائعة", callback_data="menu_faq"),
         ],
         [
             InlineKeyboardButton("👤 حسابي", callback_data="menu_my_info"),
-            InlineKeyboardButton("📞 تحدث مع خبير تسويق", callback_data="menu_contact"),
+            InlineKeyboardButton("📞 استشارة وتواصل مباشر", callback_data="menu_contact"),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def roas_calculator_keyboard() -> InlineKeyboardMarkup:
+    """أزرار حاسبة العائد الإعلاني التفاعلية"""
+    keyboard = [
+        [
+            InlineKeyboardButton("💵 ميزانية 300$ شهرياً", callback_data="calc_300"),
+            InlineKeyboardButton("💵 ميزانية 600$ شهرياً", callback_data="calc_600"),
+        ],
+        [
+            InlineKeyboardButton("💰 ميزانية 1,200$ شهرياً", callback_data="calc_1200"),
+            InlineKeyboardButton("🚀 ميزانية 2,500$ شهرياً", callback_data="calc_2500"),
+        ],
+        [
+            InlineKeyboardButton("👑 ميزانية +5,000$ (VIP)", callback_data="calc_5000"),
+        ],
+        [
+            InlineKeyboardButton("🚀 اطلب خطة إعلانية مخصصة", callback_data="menu_new_order"),
+            InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="menu_main"),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def budget_selection_keyboard() -> InlineKeyboardMarkup:
+    """أزرار سريعة لاختيار الميزانية الشهرية في خطوة الطلب"""
+    keyboard = [
+        [
+            InlineKeyboardButton("💵 300$ - 600$ (انطلاق)", callback_data="bgt_low"),
+            InlineKeyboardButton("💰 700$ - 1,500$ (نمو سريع)", callback_data="bgt_mid"),
+        ],
+        [
+            InlineKeyboardButton("🚀 1,500$ - 3,000$ (توسع)", callback_data="bgt_high"),
+            InlineKeyboardButton("👑 أكثر من 3,000$ (VIP)", callback_data="bgt_vip"),
+        ],
+        [
+            InlineKeyboardButton("✍️ كتابة ميزانية مخصصة بنص", callback_data="bgt_custom"),
+        ],
+        [
+            InlineKeyboardButton("❌ إلغاء الطلب", callback_data="cancel_order"),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -241,11 +292,17 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     user = update.effective_user
 
     text = (
-        f"أهلاً بك يا **{user.first_name}** في **Spark AI**! 🚀🔥\n"
-        "**وكالتك الرائدة للتسويق الرقمي والإعلانات الممولة المدعومة بالذكاء الاصطناعي.**\n\n"
-        "نساعدك على مضاعفة مبيعاتك، تقليل تكلفة الاكتساب (CPA)، وتحقيق أعلى عائد إعلاني (ROAS) "
-        "عبر إعلانات استراتيجية ومحتوى بياع وأتمتة مسارات التحويل.\n\n"
-        "👇 **كيف يمكننا مساعدتك اليوم؟ اختر من القائمة أدناه:**"
+        f"👑 **أهلاً بك يا {user.first_name} في عالم Spark AI** 🚀🔥\n"
+        "━━━━━━━━━━━━━━━━━━━━\n"
+        "✨ **شريكك الاستراتيجي للنمو ومضاعفة المبيعات بالإعلانات الممولة والذكاء الاصطناعي.**\n\n"
+        "💎 **ماذا نقدم لمشروعك؟**\n"
+        "• 📈 تحقيق أعلى عائد إنفاق إعلاني (**ROAS من 3.5x إلى 7x**).\n"
+        "• 🎯 استهداف فائق الدقة وخفض تكلفة اكتساب العميل (**CPA**).\n"
+        "• 🎬 فيديوهات وتصاميم إعلانية بياعة (UGC & Reels) تجذب المشترين.\n"
+        "• ⚡ أتمتة الردود والمبيعات بالذكاء الاصطناعي على مدار 24 ساعة.\n\n"
+        "🎁 **هدية ترحيبية:** كود خصم خاص `SPARK20` بخصم 20% على إدارة حملتك الأولى!\n"
+        "━━━━━━━━━━━━━━━━━━━━\n"
+        "👇 **اختر الخدمة أو الأداة التفاعلية للبدء فوراً:**"
     )
     if update.callback_query:
         try:
@@ -426,15 +483,58 @@ async def select_platform_callback(update: Update, context: ContextTypes.DEFAULT
 
     text = (
         f"🎯 المنصات المختارة: **{chosen_plt}**\n\n"
-        "الخطوة (4 من 5): **كم الميزانية الإعلانية التقريبية وما هو هدفك الرئيسي؟**\n"
-        "*(مثال: 500$ شهرياً بهدف زيادة المبيعات على المتجر، أو 1000$ لجلب عملاء محتملين للعيادة)*\n\n"
-        "✍️ **اكتب الميزانية والهدف في رسالة نصية:**"
+        "الخطوة (4 من 5): **كم ميزانيتك الإعلانية الشهرية التقريبية؟** 💰\n"
+        "*(اختر من الباقات السريعة أدناه، أو اكتب ميزانيتك وهدفك في رسالة)*:"
+    )
+    await safe_edit_message(query, text, reply_markup=budget_selection_keyboard())
+    return STATE_BUDGET
+
+
+async def select_budget_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """معالجة النقر على أزرار الميزانية السريعة"""
+    query = update.callback_query
+    try:
+        await query.answer()
+    except Exception:
+        pass
+
+    data = query.data
+    if data == "cancel_order":
+        await safe_edit_message(query, "❌ تم إلغاء طلب الحملة.", reply_markup=back_to_main_keyboard())
+        context.user_data.clear()
+        return ConversationHandler.END
+
+    if data == "bgt_custom":
+        text = (
+            "✍️ **يرجى كتابة ميزانيتك وهدفك في رسالة نصية:**\n"
+            "*(مثال: 800$ لزيادة مبيعات متجر عطور)*"
+        )
+        cancel_kb = InlineKeyboardMarkup(
+            [[InlineKeyboardButton("❌ إلغاء الطلب", callback_data="cancel_order")]]
+        )
+        await safe_edit_message(query, text, reply_markup=cancel_kb)
+        return STATE_BUDGET
+
+    budget_map = {
+        "bgt_low": "300$ - 600$ شهرياً (خطة الانطلاق)",
+        "bgt_mid": "700$ - 1,500$ شهرياً (خطة النمو السريع)",
+        "bgt_high": "1,500$ - 3,000$ شهرياً (خطة التوسع ومضاعفة المبيعات)",
+        "bgt_vip": "أكثر من 3,000$ شهرياً (باقة VIP للشركات والمتاجر الكبرى)",
+    }
+    context.user_data["budget_goal"] = budget_map.get(data, "ميزانية مخصصة")
+
+    text = (
+        f"💰 الميزانية المحددة: **{context.user_data['budget_goal']}**\n\n"
+        "الخطوة (5 من 5): **بيانات التواصل لمناقشة الخطة** 📞\n"
+        "يرجى إرسال **اسمك الكريم** مع **رقم الهاتف أو الواتساب** (مع مفتاح الدولة):\n"
+        "*(مثال: أحمد - +966501234567)*\n\n"
+        "✍️ **أرسل اسمك ورقم هاتفك الآن في رسالة:**"
     )
     cancel_kb = InlineKeyboardMarkup(
         [[InlineKeyboardButton("❌ إلغاء الطلب", callback_data="cancel_order")]]
     )
     await safe_edit_message(query, text, reply_markup=cancel_kb)
-    return STATE_BUDGET
+    return STATE_CONTACT
 
 
 async def enter_budget_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -1020,6 +1120,159 @@ async def menu_callbacks_handler(update: Update, context: ContextTypes.DEFAULT_T
             reply_markup=back_to_main_keyboard(),
         )
 
+    # 1. حاسبة العائد المتوقع ROAS
+    elif data == "menu_roas_calc":
+        text = (
+            "📊 **حاسبة العائد المتوقع على الإنفاق الإعلاني (ROAS Calculator)** 🧮\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "اكتشف حجم المبيعات والنقرات والعملاء المتوقع وصولهم لمشروعك بناءً على ميزانيتك الشهرية المقترحة:\n\n"
+            "👇 **اختر ميزانيتك الشهرية التقريبية لترى النتائج فوراً:**"
+        )
+        await safe_edit_message(query, text, reply_markup=roas_calculator_keyboard())
+
+    elif data.startswith("calc_"):
+        calc_data = {
+            "calc_300": {
+                "budget": "300$ شهرياً (10$/يوم)",
+                "reach": "15,000 - 30,000 شخص مهتم",
+                "clicks": "600 - 1,200 نقرة مستهدفة",
+                "leads": "20 - 45 عميل محتمل / مبيعة",
+                "roas": "3.2x إلى 4.5x",
+                "revenue": "960$ - 1,350$",
+                "strategy": "التركيز على إنستغرام وتيك توك بفيديو ريلز جذاب وعرض افتتاحي قوي لا يقاوم.",
+            },
+            "calc_600": {
+                "budget": "600$ شهرياً (20$/يوم)",
+                "reach": "35,000 - 70,000 شخص مهتم",
+                "clicks": "1,400 - 2,800 نقرة مستهدفة",
+                "leads": "50 - 110 عميل محتمل / مبيعة",
+                "roas": "3.8x إلى 5.2x",
+                "revenue": "2,280$ - 3,120$",
+                "strategy": "تقسيم الميزانية بين استهداف بارد (Meta) وحملة إعادة استهداف (Retargeting) للسلات المتروكة.",
+            },
+            "calc_1200": {
+                "budget": "1,200$ شهرياً (40$/يوم)",
+                "reach": "80,000 - 160,000 شخص مهتم",
+                "clicks": "3,200 - 6,500 نقرة مستهدفة",
+                "leads": "120 - 260 عميل محتمل / مبيعة",
+                "roas": "4.2x إلى 6.0x",
+                "revenue": "5,040$ - 7,200$",
+                "strategy": "دمج إعلانات سناب وتيك توك مع بحث جوجل لتحقيق أعلى معدل إغلاق صفقات ومبيعات فورية.",
+            },
+            "calc_2500": {
+                "budget": "2,500$ شهرياً (83$/يوم)",
+                "reach": "180,000 - 380,000 شخص مهتم",
+                "clicks": "7,500 - 15,000 نقرة مستهدفة",
+                "leads": "280 - 600 عميل محتمل / مبيعة",
+                "roas": "4.5x إلى 6.8x",
+                "revenue": "11,250$ - 17,000$",
+                "strategy": "قمع تسويقي كامل (Full-Funnel): صناعة وعي، تفاعل، بيع مباشر، ورسائل تذكير تلقائية بالـ AI.",
+            },
+            "calc_5000": {
+                "budget": "+5,000$ شهرياً (VIP)",
+                "reach": "+500,000 وصول واسع ومكثف",
+                "clicks": "+25,000 زيارة للمتجر/الموقع",
+                "leads": "+1,200 طلب وعميل مستهدف",
+                "roas": "5.0x إلى 7.5x+",
+                "revenue": "+25,000$ إلى 37,500$",
+                "strategy": "إدارة إعلانية متكاملة بالذكاء الاصطناعي، اختبار أكثر من 20 تصميم إعلاني، وتتبع دقيق للـ Conversions.",
+            },
+        }
+        res = calc_data.get(data, calc_data["calc_600"])
+        text = (
+            f"📊 **تحليل العائد المتوقع لميزانية {res['budget']}**\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            f"👥 **الوصول والظهور:** {res['reach']}\n"
+            f"🎯 **النقرات والزيارات:** {res['clicks']}\n"
+            f"🛍️ **المبيعات / العملاء المتوقعين:** {res['leads']}\n"
+            f"📈 **العائد على الإنفاق الإعلاني (ROAS):** **{res['roas']}**\n"
+            f"💰 **المبيعات التقديرية:** **{res['revenue']}**\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            f"💡 **الخطة والتوصية الاستراتيجية:**\n{res['strategy']}\n"
+        )
+        kb = InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton("🚀 احجز حملتك بهذه الميزانية فوراً", callback_data="menu_new_order")],
+                [InlineKeyboardButton("🔄 تجربة ميزانية أخرى", callback_data="menu_roas_calc")],
+                [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="menu_main")],
+            ]
+        )
+        await safe_edit_message(query, text, reply_markup=kb)
+
+    # 2. قصص النجاح
+    elif data == "menu_cases":
+        text = (
+            "🏆 **قصص نجاح وإنجازات حقيقية من Spark AI** 📈🔥\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "أرقام ونتائج واقعية حققناها لشركائنا في النجاح:\n\n"
+            "🛍️ **1. متجر أزياء وعبايات خليجي (E-commerce):**\n"
+            "• الميزانية: 1,800$ شهرياً\n"
+            "• القنوات: سناب شات + تيك توك بمحتوى UGC وتصاميم عصرية.\n"
+            "• النتيجة: قفزة بالمبيعات من 4,200$ إلى **28,500$ شهرياً** (ROAS 5.1x) في 45 يوماً فقط!\n\n"
+            "🦷 **2. مجمع عيادات أسنان وتجميل (Medical Clinic):**\n"
+            "• الميزانية: 1,200$ شهرياً\n"
+            "• القنوات: إعلانات جوجل سيرش + إنستغرام ريلز ورسائل واتساب.\n"
+            "• النتيجة: **165 حجز كشف مؤكد شهرياً** بتكلفة 7.8$ فقط لكل مريض!\n\n"
+            "🏢 **3. شركة حلول تقنية و B2B (Tech Solutions):**\n"
+            "• الميزانية: 900$ شهرياً\n"
+            "• القنوات: إعلانات ميتا موجهة بحملات Lead Generation ومسار تحويل سريع.\n"
+            "• النتيجة: توقيع **34 عقد شراكة سنوي** بمعدل تحويل قياسي.\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "✨ *مشروعك القادم يمكن أن يكون قصة نجاحنا التالية!*"
+        )
+        kb = InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton("🚀 أريد تحقيق نتائج مماثلة لمشروعي", callback_data="menu_new_order")],
+                [InlineKeyboardButton("🎁 اطلب فحص وتدقيق مجاني لحسابك", callback_data="menu_free_audit")],
+                [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="menu_main")],
+            ]
+        )
+        await safe_edit_message(query, text, reply_markup=kb)
+
+    # 3. التدقيق المجاني
+    elif data == "menu_free_audit":
+        text = (
+            "🎁 **خدمة فحص وتدقيق الحسابات الإعلانية مجاناً (Free Ad Audit)** 🔍\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "هل تشعر أن حملاتك الإعلانية السابقة:\n"
+            "❌ لا تحقق المبيعات التي تتوقعها؟\n"
+            "❌ تستهلك ميزانية مرتفعة دون عائد حقيقي؟\n"
+            "❌ الزوار يدخلون موقعك دون إتمام عمليات الشراء؟\n\n"
+            "💡 **فريق خبراء Spark AI يقدم لك تحليلاً شاملاً لحسابك مجاناً 100%:**\n"
+            "1️⃣ كشف نقاط هدر الميزانية في الاستهداف والجمهور.\n"
+            "2️⃣ فحص مسار الشراء وصفحة الهبوط لمعرفة سبب تسرب العملاء.\n"
+            "3️⃣ تزويدك بـ 3 توصيات حصرية لرفع مبيعاتك فوراً.\n\n"
+            "⚡ *الخدمة مجانية تماماً وبدون أي التزام تعاقدي!*"
+        )
+        kb = InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton("📝 طلب التدقيق المجاني الآن", callback_data="menu_new_order")],
+                [InlineKeyboardButton("💬 استشارة فورية مع خبير", callback_data="menu_contact")],
+                [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="menu_main")],
+            ]
+        )
+        await safe_edit_message(query, text, reply_markup=kb)
+
+    # 4. كوبون الخصم الترحيبي
+    elif data == "menu_promo":
+        text = (
+            "🎟️ **قسيمة خصم ترحيبية خاصة بك من Spark AI** 🎁\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "🔥 **كود الخصم:** `SPARK20`\n"
+            "💎 **القيمة:** **خصم 20%** على أتعاب إدارة الحملة الإعلانية للشهر الأول!\n"
+            "⏳ **الصلاحية:** متاح لجميع العملاء الجدد عند إطلاق الحملة الأولى.\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            "📋 **طريقة التفعيل:**\n"
+            "اضغط على زر (اطلب حملتك الآن) أدناه، وسيتم تطبيق الخصم فوراً في عرض السعر النهائي لحملتك!"
+        )
+        kb = InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton("🚀 تفعيل الكود وطلب الحملة الآن", callback_data="menu_new_order")],
+                [InlineKeyboardButton("🔙 العودة للقائمة الرئيسية", callback_data="menu_main")],
+            ]
+        )
+        await safe_edit_message(query, text, reply_markup=kb)
+
     # معالجات تفاعلية لأزرار المجموعة (أتمتة استلام الحملات)
     elif data.startswith("grp_take_"):
         order_code = data.replace("grp_take_", "")
@@ -1189,6 +1442,23 @@ async def smart_text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
 # 8. معالج الأخطاء العام
 # -------------------------------------------------------------
 
+async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """أمر /stats لعرض إحصائيات ونشاط البوت والطلبات المسجلة"""
+    stats = database.get_orders_stats()
+    text = (
+        "📊 **لوحة مؤشرات وأداء Spark AI Bot** 🚀\n"
+        "━━━━━━━━━━━━━━━━━━━━\n"
+        f"📦 **إجمالي طلبات الحملات:** `{stats['total_orders']}` طلب\n"
+        f"👥 **إجمالي العملاء المميزين:** `{stats['total_clients']}` عميل\n"
+        f"🚀 **حملات نشطة ومطلقة:** `{stats['active_campaigns']}` حملة\n"
+        f"📞 **طلبات تم استلامها والتواصل معها:** `{stats['contacted_orders']}` طلب\n"
+        f"🎯 **الخدمة الأكثر طلباً:** {stats['top_service']}\n"
+        "━━━━━━━━━━━━━━━━━━━━\n"
+        "🟢 **حالة السيرفر:** متصل ونشط في السحابة 24/7"
+    )
+    await update.message.reply_text(text, parse_mode="Markdown")
+
+
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """تسجيل أي خطأ أثناء تشغيل البوت"""
     logger.error("حدث استثناء أثناء معالجة التحديث:", exc_info=context.error)
@@ -1243,6 +1513,7 @@ def main() -> None:
                 CallbackQueryHandler(select_platform_callback, pattern="^(plt_.*|cancel_order)$"),
             ],
             STATE_BUDGET: [
+                CallbackQueryHandler(select_budget_callback, pattern="^(bgt_.*|cancel_order)$"),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, enter_budget_handler),
                 CallbackQueryHandler(cancel_conversation, pattern="^cancel_order$"),
             ],
@@ -1261,7 +1532,7 @@ def main() -> None:
             CallbackQueryHandler(cancel_conversation, pattern="^cancel_order$"),
             # السماح بالخروج من المحادثة إلى أي زر من أزرار القوائم بسلاسة
             CallbackQueryHandler(menu_callbacks_handler, pattern="^menu_.*"),
-            CallbackQueryHandler(menu_callbacks_handler, pattern="^(srv_.*|rec_.*|faq_.*)"),
+            CallbackQueryHandler(menu_callbacks_handler, pattern="^(srv_.*|rec_.*|faq_.*|calc_.*)"),
         ],
         per_chat=True,
         per_user=True,
@@ -1297,6 +1568,7 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("info", info_command))
+    application.add_handler(CommandHandler("stats", stats_command))
     application.add_handler(CommandHandler("services", lambda u, c: menu_callbacks_handler(u, c)))
     application.add_handler(CommandHandler("track", track_command))
     application.add_handler(CommandHandler("admin", admin_orders_command))
