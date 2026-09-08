@@ -141,5 +141,36 @@ def update_order_status(order_code: str, new_status: str) -> bool:
     return affected > 0
 
 
+def get_orders_stats() -> Dict[str, Any]:
+    """جلب إحصائيات متقدمة للطلبات والحملات المسجلة"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT COUNT(*) as total FROM campaign_orders")
+    total_orders = cursor.fetchone()["total"]
+    
+    cursor.execute("SELECT COUNT(DISTINCT user_id) as users FROM campaign_orders")
+    total_clients = cursor.fetchone()["users"]
+    
+    cursor.execute("SELECT COUNT(*) as active FROM campaign_orders WHERE status LIKE '%نشطة%' OR status LIKE '%إطلاق%'")
+    active_campaigns = cursor.fetchone()["active"]
+
+    cursor.execute("SELECT COUNT(*) as contacted FROM campaign_orders WHERE status LIKE '%تواصل%' OR status LIKE '%استلام%'")
+    contacted_orders = cursor.fetchone()["contacted"]
+    
+    cursor.execute("SELECT service_type, COUNT(*) as cnt FROM campaign_orders GROUP BY service_type ORDER BY cnt DESC LIMIT 1")
+    top_service_row = cursor.fetchone()
+    top_service = top_service_row["service_type"] if top_service_row else "إعلانات ممولة"
+    
+    conn.close()
+    return {
+        "total_orders": total_orders,
+        "total_clients": total_clients,
+        "active_campaigns": active_campaigns,
+        "contacted_orders": contacted_orders,
+        "top_service": top_service,
+    }
+
+
 # تهيئة قاعدة البيانات فور استيراد الملف
 init_db()
